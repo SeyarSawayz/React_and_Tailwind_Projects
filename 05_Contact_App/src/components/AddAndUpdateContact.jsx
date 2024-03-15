@@ -1,23 +1,28 @@
 import React from "react";
-import Modal from "./Modal";
-import { Form, Formik, Field } from "formik";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
-import { toast } from "react-toastify";
 import * as yup from "yup";
+import { Formik, Form, Field } from "formik";
+import Modal from "./Modal";
+import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { toast } from "react-toastify";
+import { db } from "../config/firebase";
 import { ErrorMessage } from "formik";
 
-const contactsValidationSchema = yup.object().shape({
-  name: yup.string().required("name is required"),
-  email: yup.string().email("email is not valid").required("email is required"),
+const formValidationSchema = yup.object().shape({
+  name: yup.string().required("my frined name is a required field 😊"),
+  email: yup.string().email().required("Email is required"),
+  Mobile: yup
+    .number()
+    .min(1000000000, "invalid mobile number")
+    .max(9999999999, "invalid too long")
+    .required("Mobile is required"),
 });
 
-const AddAndUpdateContact = ({ isOpen, onClose, isUpdate, contact }) => {
-  const addContact = async (value) => {
+const AddandUpdateContact = ({ isOpen, onClose, isUpdate, contact }) => {
+  const addContact = async (contact) => {
     try {
-      const contactRef = collection(db, "contacts");
-      await addDoc(contactRef, value);
-      toast.success("Contact Added Successfully");
+      const contactRef = collection(db, "kayhantechcontacts");
+      await addDoc(contactRef, contact);
+      toast.success("Contact added Successfully");
 
       onClose();
     } catch (error) {
@@ -27,9 +32,9 @@ const AddAndUpdateContact = ({ isOpen, onClose, isUpdate, contact }) => {
 
   const updateContact = async (contact, id) => {
     try {
-      const contactRef = doc(db, "contacts", id);
+      const contactRef = doc(db, "kayhantechcontacts", id);
       await updateDoc(contactRef, contact);
-      toast.success("Contact Updated Successfully");
+      toast.success("Contact updated Successfully");
 
       onClose();
     } catch (error) {
@@ -38,53 +43,76 @@ const AddAndUpdateContact = ({ isOpen, onClose, isUpdate, contact }) => {
   };
 
   return (
-    <div>
+    <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <Formik
-          validationSchema={contactsValidationSchema}
+          validationSchema={formValidationSchema}
           initialValues={
             isUpdate
               ? {
                   name: contact.name,
                   email: contact.email,
+                  Mobile: contact.Mobile,
                 }
               : {
                   name: "",
                   email: "",
+                  Mobile: "",
                 }
           }
-          onSubmit={(values) => {
-            console.log(values.name);
-            isUpdate ? updateContact(values, contact.id) : addContact(values);
+          onSubmit={(e) => {
+            isUpdate ? updateContact(e, contact.id) : addContact(e);
           }}
         >
-          <Form className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1 ">
-              <label htmlFor="name">Name</label>
-              <Field className="px-2 border h-10" name="name" />
-              <div className="text-red-600">
-                <ErrorMessage name="name" />
+          <Form>
+            <div className="flex flex-col gap-4 px-4">
+              <div className="flex flex-col gap-1">
+                <label htmlFor="name" className="font-medium text-sm">
+                  Name
+                </label>
+                <Field
+                  name="name"
+                  className="bg-transparent border p-2 text-sm"
+                ></Field>
+                <div className="text-red-500">
+                  <ErrorMessage name="name" />
+                </div>
               </div>
-            </div>
-
-            <div className="flex flex-col gap-1 ">
-              <label htmlFor="email">Email</label>
-              <Field type="email" className="px-2 border h-10" name="email" />
-              <div className="text-red-600">
-                <ErrorMessage name="email" />
+              <div className="flex flex-col gap-1">
+                <label htmlFor="email" className="font-medium text-sm">
+                  Email
+                </label>
+                <Field
+                  type="email"
+                  name="email"
+                  className="bg-transparent border p-2 text-sm"
+                ></Field>
+                <div className="text-red-500">
+                  <ErrorMessage name="email" />
+                </div>
               </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor="Mobile" className="font-medium text-sm">
+                  Mobile
+                </label>
+                <Field
+                  name="Mobile"
+                  type="text"
+                  className="bg-transparent border p-2 text-sm"
+                ></Field>
+                <div className="text-red-500">
+                  <ErrorMessage name="Mobile" />
+                </div>
+              </div>
+              <button className="bg-blue-400 px-2 py-1.5 self-end rounded-lg text-white font-medium cursor-pointer ">
+                {isUpdate ? "Update" : "Add"} Contact
+              </button>
             </div>
-            <button
-              type="submit"
-              className="bg-orange px-3 py-1.5 rounded self-end"
-            >
-              {isUpdate ? "Update" : "Add"} Contact
-            </button>
           </Form>
         </Formik>
       </Modal>
-    </div>
+    </>
   );
 };
 
-export default AddAndUpdateContact;
+export default AddandUpdateContact;

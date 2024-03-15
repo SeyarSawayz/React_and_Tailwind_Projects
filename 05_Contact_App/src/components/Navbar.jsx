@@ -1,15 +1,13 @@
 import React from "react";
-<script
-  src="https://kit.fontawesome.com/67f2c88127.js"
-  crossorigin="anonymous"
-></script>;
 
 const Navbar = () => {
   return (
     <>
-      <div className="h-[60px] bg-white my-4 rounded-xl flex items-center justify-center gap-3">
-        <img src="/firebase.svg" alt="" />
-        <h1 className="font-medium text-lg">Firebase Contact App</h1>
+      <div className="bg-[#78A083] flex gap-2 px-4 items-center justify-center max-w-[360px] h-[60px] rounded-xl mt-4 ">
+        <div>
+          <img src="/firebase.svg" alt="Firebase logo" />
+        </div>
+        <h1 className="font-medium">KayhaTech IT Service Contact App</h1>
       </div>
     </>
   );

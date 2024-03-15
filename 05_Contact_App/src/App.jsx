@@ -1,95 +1,81 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import { FaSearch } from "react-icons/fa";
-import { FaCirclePlus } from "react-icons/fa6";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
-import Modal from "./components/Modal";
-import useDisclouse from "./customeHooks/useDisclouse";
+import SearchandAdd from "./components/SearchandAdd";
+import CardContact from "./components/CardContact";
+import { db } from "./config/firebase";
+import { collection, doc, onSnapshot } from "firebase/firestore";
+import AddandDeleteContact from "./components/AddandUpdateContact";
+import useDiclouse from "./components/customHooks/useDiclouse";
+import NoContactsFound from "./components/NoContactsFound";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { db } from "./config/firebase";
-import ContactCards from "./components/ContactCards";
-import AddAndUpdateContact from "./components/AddAndUpdateContact";
-import NotFoundContact from "./components/NotFoundContact";
-
 const App = () => {
   const [contact, setContact] = useState([]);
-  const { isOpen, onClose, onOpen } = useDisclouse();
+  const { isOpen, onClose, onOpen } = useDiclouse();
 
   useEffect(() => {
-    const getContacts = () => {
+    const getContact = async () => {
       try {
-        const contactsRef = collection(db, "contacts");
-
-        onSnapshot(contactsRef, (snapshot) => {
-          const contactList = snapshot.docs.map((doc) => {
+        const contactRef = collection(db, "kayhantechcontacts");
+        onSnapshot(contactRef, (contact) => {
+          const contactList = contact.docs.map((doc) => {
             return {
               id: doc.id,
               ...doc.data(),
             };
           });
           setContact(contactList);
-          return contactList;
         });
       } catch (error) {
         console.log(error);
       }
     };
-    getContacts();
+    getContact();
   }, []);
 
-  const filterContacts = (e) => {
+  const filteredContacts = (e) => {
     const value = e.target.value;
-    const contactsRef = collection(db, "contacts");
-
-    onSnapshot(contactsRef, (snapshot) => {
-      const contactList = snapshot.docs.map((doc) => {
+    const contactRef = collection(db, "kayhantechcontacts");
+    onSnapshot(contactRef, (contact) => {
+      const contactList = contact.docs.map((doc) => {
         return {
           id: doc.id,
           ...doc.data(),
         };
       });
-
-      const filteredContacts = contactList.filter((contact) =>
+      const filter = contactList.filter((contact) =>
         contact.name.toLowerCase().includes(value.toLowerCase())
       );
-      setContact(filteredContacts);
-      return filteredContacts;
+
+      setContact(filter);
     });
   };
 
-  console.log(contact);
   return (
     <>
       <div className="container mx-auto max-w-[370px] px-4">
         <Navbar />
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center relative flex-grow">
-            <FaSearch className="absolute text-white text-2xl ml-2  " />
-            <input
-              onChange={filterContacts}
-              type="text"
-              placeholder="Search"
-              className="flex-grow rounded-md h-10 bg-transparent border border-white pl-10 px-4 text-white"
-            />
-          </div>
-
-          <FaCirclePlus
-            className="text-white text-4xl cursor-pointer"
-            onClick={onOpen}
-          />
-        </div>
-        <div className="mt-4 flex flex-col gap-3">
-          {contact.length <= 0 ? (
-            <NotFoundContact />
-          ) : (
-            contact.map((contact) => (
-              <ContactCards key={contact.id} contact={contact} />
-            ))
-          )}
-        </div>
-        <AddAndUpdateContact isOpen={isOpen} onClose={onClose} />
+        <SearchandAdd
+          isOpen={isOpen}
+          onOpen={onOpen}
+          contact={contact}
+          filteredContacts={filteredContacts}
+        />
+        {contact.length <= 0 ? (
+          <NoContactsFound />
+        ) : (
+          contact.map((contact) => (
+            <div className=" mt-8" key={contact.id}>
+              <CardContact key={contact.id} contact={contact} onOpen={onOpen} />
+            </div>
+          ))
+        )}
+        <AddandDeleteContact
+          isOpen={isOpen}
+          onClose={onClose}
+          onOpen={onOpen}
+        />
         <ToastContainer position="bottom-center" />
       </div>
     </>

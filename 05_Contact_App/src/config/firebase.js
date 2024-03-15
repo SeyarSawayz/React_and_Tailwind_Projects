@@ -6,14 +6,14 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCWWAvTVCXa0SYXyP1fuTc5uDPAKVZRvIo",
-  authDomain: "vite-contact-app-bcdc7.firebaseapp.com",
-  projectId: "vite-contact-app-bcdc7",
-  storageBucket: "vite-contact-app-bcdc7.appspot.com",
-  messagingSenderId: "873798426323",
-  appId: "1:873798426323:web:5e6f77ecba3c879fd57e26",
+  apiKey: "AIzaSyCvfA09QpWKMuBlBRNxjFJrOPdcA_EBTHU",
+  authDomain: "kayhantechcontactapp.firebaseapp.com",
+  projectId: "kayhantechcontactapp",
+  storageBucket: "kayhantechcontactapp.appspot.com",
+  messagingSenderId: "881765250070",
+  appId: "1:881765250070:web:7cfe448ad7b08315fe7137",
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
